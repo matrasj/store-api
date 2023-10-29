@@ -1,0 +1,5 @@
+databaseChangeLog:
+  - include:
+      file: db/001-create-country-table.yaml
+  - include:
+      file: db/002-create-user-account-table.yaml

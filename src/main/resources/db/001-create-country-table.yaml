@@ -1,0 +1,30 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-country-table
+      author: matrasj
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: country
+      changes:
+        - createTable:
+            tableName: country
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR
+                  constraints:
+                    nullable: false

@@ -1,0 +1,74 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-create-user-account-table
+      author: matrasj
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: user_account
+      changes:
+        - createTable:
+            tableName: user_account
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: help_email
+                  type: VARCHAR
+              - column:
+                  name: password
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: firstname
+                  type: VARCHAR
+              - column:
+                  name: lastname
+                  type: VARCHAR
+              - column:
+                  name: phone_number
+                  type: VARCHAR
+              - column:
+                  name: username
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: create_date
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_edit_date
+                  type: timestamp without time zone
+              - column:
+                  name: removed
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: false
+              - column:
+                  name: role
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: false
