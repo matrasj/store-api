@@ -5,4 +5,5 @@ public enum Role {
     MODERATOR,
     EMPLOYEE,
     CUSTOMER
+
 }
