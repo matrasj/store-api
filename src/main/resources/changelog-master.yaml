@@ -3,3 +3,7 @@ databaseChangeLog:
       file: db/001-create-country-table.yaml
   - include:
       file: db/002-create-user-account-table.yaml
+  - include:
+      file: db/003-create-user-address-table.yaml
+  - include:
+      file: db/004-create-confirmation-token-table.yaml

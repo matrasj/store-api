@@ -1,32 +1,25 @@
 package com.flexible.store.entity;
 
+import com.flexible.store.entity.abstraction.BaseEntity;
 import com.flexible.store.entity.type.Role;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.stream.Collectors;
+import java.util.Collections;
 
 @Entity(name = "user_account")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter
 @Getter
-public class UserAccountEntity implements UserDetails {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+@Builder
+public class UserAccountEntity extends BaseEntity implements UserDetails {
     @Column(name = "email")
     private String email;
     @Column(name = "help_email")
@@ -41,26 +34,15 @@ public class UserAccountEntity implements UserDetails {
     private String phoneNumber;
     @Column(name = "username")
     private String username;
-    @Column(name = "create_date")
-    @CreationTimestamp
-    private LocalDateTime createDate;
-    @Column(name = "last_edit_date")
-    @UpdateTimestamp
-    private LocalDateTime lastEditDate;
-    @Column(name = "removed")
-    private Boolean removed;
     @Column(name = "active")
     private Boolean active;
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
     private Role role;
 
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Arrays.stream(Role.values())
-                .map((role) -> new SimpleGrantedAuthority(role.name()))
-                .collect(Collectors.toList());
+        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + this.role));
     }
 
     @Override

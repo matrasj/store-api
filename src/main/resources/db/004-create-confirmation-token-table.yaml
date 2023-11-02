@@ -1,15 +1,15 @@
 databaseChangeLog:
   - changeSet:
-      id: 001-create-country-table
+      id: 004-create-user-confirmation-token-table
       author: matrasj
       preConditions:
         onFail: MARK_RAN
         not:
           tableExists:
-            tableName: country
+            tableName: confirmation_token
       changes:
         - createTable:
-            tableName: country
+            tableName: confirmation_token
             columns:
               - column:
                   name: id
@@ -19,15 +19,27 @@ databaseChangeLog:
                     primaryKey: true
                     nullable: false
               - column:
-                  name: name
+                  name: token
                   type: VARCHAR
                   constraints:
                     nullable: false
               - column:
-                  name: code
-                  type: VARCHAR
+                  name: expires_at
+                  type: timestamp without time zone
                   constraints:
                     nullable: false
+              - column:
+                  name: confirmed_at
+                  type: timestamp without time zone
+              - column:
+                  name: user_account_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKey:
+                      referencedColumnNames: id
+                      referencedTableName: user_account
+                      foreignKeyName: fk_confirmation_token_user_account
               - column:
                   name: create_date
                   type: timestamp without time zone

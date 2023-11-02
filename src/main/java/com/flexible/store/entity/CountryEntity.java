@@ -1,5 +1,6 @@
 package com.flexible.store.entity;
 
+import com.flexible.store.entity.abstraction.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -11,11 +12,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class CountryEntity {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
-    private Long id;
+public class CountryEntity extends BaseEntity {
     @Column(name = "name")
     private String name;
     @Column(name = "code")

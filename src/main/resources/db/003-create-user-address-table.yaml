@@ -1,0 +1,84 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-create-user-address-table
+      author: matrasj
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: user_address
+      changes:
+        - createTable:
+            tableName: user_address
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: firstname
+                  type: VARCHAR
+              - column:
+                  name: lastname
+                  type: VARCHAR
+              - column:
+                  name: phone_number
+                  type: VARCHAR
+              - column:
+                  name: company
+                  type: VARCHAR
+              - column:
+                  name: zip_code
+                  type: VARCHAR
+              - column:
+                  name: city
+                  type: VARCHAR
+              - column:
+                  name: street_and_home_number
+                  type: VARCHAR
+              - column:
+                  name: country_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKey:
+                      referencedColumnNames: id
+                      referencedTableName: country
+                      foreignKeyName: fk_user_address_country
+              - column:
+                  name: user_account_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    foreignKey:
+                      referencedColumnNames: id
+                      referencedTableName: user_account
+                      foreignKeyName: fk_user_address_user_account
+              - column:
+                  name: create_date
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_edit_date
+                  type: timestamp without time zone
+              - column:
+                  name: removed
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: false
+              - column:
+                  name: active
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: false
