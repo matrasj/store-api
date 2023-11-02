@@ -5,7 +5,7 @@ import com.flexible.store.entity.type.Role;
 import java.util.List;
 
 public interface AuthoritiesResolver {
-    boolean hasRole(Role role);
-    boolean hasOneOfRoles(List<Role> roles);
+    boolean hasRoleAndIsActive(Role role);
+    boolean hasOneOfRolesAndIsActive(List<Role> roles);
     String obtainUsernameFromCurrentAuthenticationContext();
 }

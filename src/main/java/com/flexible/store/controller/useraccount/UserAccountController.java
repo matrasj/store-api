@@ -15,21 +15,21 @@ import java.util.List;
 public class UserAccountController extends CrudController<UserAccountEntity, UserAccountDto> {
     @Override
     public boolean hasPermissionToSave() {
-        return super.authoritiesResolver.hasOneOfRoles(List.of(Role.values()));
+        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(Role.values()));
     }
 
     @Override
     public boolean hasPermissionToRead() {
-        return super.authoritiesResolver.hasOneOfRoles(List.of(Role.values()));
+        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(Role.values()));
     }
 
     @Override
     public boolean hasPermissionToUpdate() {
-        return super.authoritiesResolver.hasOneOfRoles(List.of(Role.values()));
+        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(Role.values()));
     }
 
     @Override
     public boolean hasPermissionToDelete() {
-        return super.authoritiesResolver.hasOneOfRoles(List.of(Role.values()));
+        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(Role.values()));
     }
 }

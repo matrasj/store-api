@@ -2,8 +2,8 @@
 server:
   port: 8081
 
-# Datasource
 spring:
+  # Datasource
   liquibase:
     change-log: classpath:changelog-master.yaml
   datasource:
@@ -16,6 +16,12 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: true
+  #Kafka
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
 
 # Jwt
 jwt:

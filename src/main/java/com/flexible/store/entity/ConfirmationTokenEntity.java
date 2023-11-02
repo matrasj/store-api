@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Setter
 @Getter
-@Builder
 public class ConfirmationTokenEntity extends BaseEntity {
     @Column(name = "token")
     private String token;
