@@ -18,7 +18,6 @@ import java.util.Collections;
 @AllArgsConstructor
 @Setter
 @Getter
-@Builder
 public class UserAccountEntity extends BaseEntity implements UserDetails {
     @Column(name = "email")
     private String email;
