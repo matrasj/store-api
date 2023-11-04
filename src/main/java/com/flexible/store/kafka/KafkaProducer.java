@@ -1,4 +1,4 @@
-package com.flexible.store.kafkaproducer;
+package com.flexible.store.kafka;
 
 import com.flexible.store.payload.useraccount.RegistrationEventPayload;
 

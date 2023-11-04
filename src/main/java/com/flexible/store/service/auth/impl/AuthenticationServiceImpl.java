@@ -4,7 +4,7 @@ import com.flexible.store.entity.ConfirmationTokenEntity;
 import com.flexible.store.entity.UserAccountEntity;
 import com.flexible.store.entity.type.Role;
 import com.flexible.store.factories.ConfirmationTokenFactory;
-import com.flexible.store.kafkaproducer.KafkaProducer;
+import com.flexible.store.kafka.KafkaProducer;
 import com.flexible.store.mapper.useraccount.UserAccountMapper;
 import com.flexible.store.payload.useraccount.RegistrationEventPayload;
 import com.flexible.store.service.auth.JwtTokenService;
