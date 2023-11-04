@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 public abstract class CrudServiceImpl<TEntity extends BaseEntity, TDto extends BaseDto> implements CrudService<TEntity, TDto> {
@@ -31,8 +32,8 @@ public abstract class CrudServiceImpl<TEntity extends BaseEntity, TDto extends B
     }
 
     @Override
-    public TEntity getById(Long id) {
-        return this.repository.findById(id).orElseThrow(EntityNotFoundException::new);
+    public Optional<TEntity> getById(Long id) {
+        return this.repository.findById(id);
     }
 
     @Override
@@ -42,7 +43,7 @@ public abstract class CrudServiceImpl<TEntity extends BaseEntity, TDto extends B
 
     @Override
     public void delete(Long id) {
-        TEntity byId = this.getById(id);
+        TEntity byId = this.getById(id).orElseThrow(EntityNotFoundException::new);
         byId.setRemoved(true);
         this.repository.save(byId);
     }

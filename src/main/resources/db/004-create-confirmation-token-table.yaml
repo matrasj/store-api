@@ -36,10 +36,9 @@ databaseChangeLog:
                   type: BIGINT
                   constraints:
                     nullable: false
-                    foreignKey:
-                      referencedColumnNames: id
-                      referencedTableName: user_account
-                      foreignKeyName: fk_confirmation_token_user_account
+                    referencedColumnNames: id
+                    referencedTableName: user_account
+                    foreignKeyName: fk_confirmation_token_user_account
               - column:
                   name: create_date
                   type: timestamp without time zone

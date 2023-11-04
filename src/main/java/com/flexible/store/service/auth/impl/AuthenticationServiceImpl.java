@@ -4,7 +4,7 @@ import com.flexible.store.entity.ConfirmationTokenEntity;
 import com.flexible.store.entity.UserAccountEntity;
 import com.flexible.store.entity.type.Role;
 import com.flexible.store.factories.ConfirmationTokenFactory;
-import com.flexible.store.kafka.KafkaProducer;
+import com.flexible.store.kafkaproducer.KafkaProducer;
 import com.flexible.store.mapper.useraccount.UserAccountMapper;
 import com.flexible.store.payload.useraccount.RegistrationEventPayload;
 import com.flexible.store.service.auth.JwtTokenService;
@@ -22,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
@@ -37,28 +39,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Transactional
     public AuthenticationResponsePayload register(RegistrationRequestPayload requestPayload) {
         var account = new UserAccountEntity();
-        account.setFirstname(requestPayload.getFirstname());
-        account.setLastname(requestPayload.getLastname());
-        account.setEmail(requestPayload.getEmail());
-        account.setUsername(requestPayload.getEmail());
-        account.setRole(Role.CUSTOMER);
-        account.setActive(Boolean.FALSE);
-        account.setPassword(this.passwordEncoder.encode(requestPayload.getPassword()));
+        this.setAccountProperties(requestPayload, account);
 
         UserAccountEntity savedUserAccount = this.userAccountService.save(this.userAccountMapper.toDto(account));
         ConfirmationTokenEntity savedConfirmationToken
                 = this.confirmationTokenService.save(ConfirmationTokenFactory.generateConfirmationToken(savedUserAccount.getId()));
 
-        this.kafkaProducer.publishMessageAboutRegistration(
-                RegistrationEventPayload.builder()
-                .confirmationToken(savedConfirmationToken.getToken())
-                .email(savedUserAccount.getEmail())
-                .firstname(savedUserAccount.getFirstname())
-                .lastname(savedUserAccount.getLastname())
-                .phoneNumber(savedUserAccount.getPhoneNumber())
-                .username(savedUserAccount.getEmail())
-                .build()
-        );
+        this.kafkaProducer.publishMessageAboutRegistration(this.buildRegistrationPayload(savedUserAccount, savedConfirmationToken));
         return AuthenticationResponsePayload.builder()
                 .confirmationToken(savedConfirmationToken.getToken())
                 .build();
@@ -77,5 +64,47 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponsePayload.builder()
                 .confirmationToken(this.jwtTokenService.generateJwtToken(userAccount))
                 .build();
+    }
+
+    @Override
+    @Transactional
+    public String confirmToken(Long confirmationTokenId) {
+        ConfirmationTokenEntity confirmationToken
+                = this.confirmationTokenService.getById(confirmationTokenId).orElseThrow(EntityNotFoundException::new);
+
+        if (confirmationToken.getConfirmedAt() != null) {
+            throw new IllegalStateException("Account is already confirmed");
+        }
+
+        LocalDateTime expiredAt = confirmationToken.getExpiresAt();
+        if (expiredAt.isBefore(LocalDateTime.now())) {
+            throw new IllegalStateException("Token already expired");
+        }
+
+        confirmationToken.setConfirmedAt(LocalDateTime.now());
+        UserAccountEntity userAccount = this.userAccountService.getById(confirmationToken.getUserAccountId())
+                .orElseThrow(EntityNotFoundException::new);
+        userAccount.setActive(Boolean.TRUE);
+        return "Successfully confirmed";
+    }
+
+    private RegistrationEventPayload buildRegistrationPayload(UserAccountEntity savedUserAccount, ConfirmationTokenEntity savedConfirmationToken) {
+        return RegistrationEventPayload.builder()
+                .email(savedUserAccount.getEmail())
+                .firstname(savedUserAccount.getFirstname())
+                .lastname(savedUserAccount.getLastname())
+                .confirmationTokenId(savedConfirmationToken.getId())
+                .build();
+    }
+
+    private void setAccountProperties(RegistrationRequestPayload requestPayload, UserAccountEntity account) {
+        account.setFirstname(requestPayload.getFirstname());
+        account.setLastname(requestPayload.getLastname());
+        account.setEmail(requestPayload.getEmail());
+        account.setUsername(requestPayload.getEmail());
+        account.setPhoneNumber(requestPayload.getPhoneNumber());
+        account.setRole(Role.CUSTOMER);
+        account.setActive(Boolean.FALSE);
+        account.setPassword(this.passwordEncoder.encode(requestPayload.getPassword()));
     }
 }

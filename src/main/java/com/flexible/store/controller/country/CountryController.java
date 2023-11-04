@@ -11,7 +11,7 @@ import java.util.List;
 import static com.flexible.store.entity.type.Role.*;
 
 @RestController
-@RequestMapping("/api/countries")
+@RequestMapping("/api/country")
 @RequiredArgsConstructor
 public class CountryController extends CrudController<CountryEntity, CountryDto> {
     @Override
@@ -21,7 +21,7 @@ public class CountryController extends CrudController<CountryEntity, CountryDto>
 
     @Override
     public boolean hasPermissionToRead() {
-        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(ADMIN, MODERATOR, EMPLOYEE));
+        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(ADMIN, MODERATOR, EMPLOYEE, CUSTOMER));
     }
 
     @Override

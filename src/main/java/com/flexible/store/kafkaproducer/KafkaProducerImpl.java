@@ -1,6 +1,6 @@
-package com.flexible.store.kafka;
+package com.flexible.store.kafkaproducer;
 
-import com.flexible.store.dto.useraccount.UserAccountDto;
+import com.flexible.store.config.KafkaPropertiesConfig;
 import com.flexible.store.payload.useraccount.RegistrationEventPayload;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -13,11 +13,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class KafkaProducerImpl implements KafkaProducer {
     private final KafkaTemplate<String, RegistrationEventPayload> kafkaUserAccountTemplate;
+    private final KafkaPropertiesConfig kafkaPropertiesConfig;
 
     public void publishMessageAboutRegistration(RegistrationEventPayload registrationEventPayload) {
         Message<RegistrationEventPayload> message = MessageBuilder
                 .withPayload(registrationEventPayload)
-                .setHeader(KafkaHeaders.TOPIC, "registration")
+                .setHeader(KafkaHeaders.TOPIC, this.kafkaPropertiesConfig.getRegistrationsTopicName())
                 .build();
         this.kafkaUserAccountTemplate.send(message);
     }

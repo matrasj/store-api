@@ -10,4 +10,5 @@ public interface AuthenticationService {
     AuthenticationResponsePayload register(RegistrationRequestPayload requestPayload);
 
     AuthenticationResponsePayload authenticate(AuthenticationRequestPayload requestPayload);
+    String confirmToken(Long confirmationTokenId);
 }
