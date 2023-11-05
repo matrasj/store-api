@@ -1,4 +1,4 @@
-package com.flexible.store.repository.useraccount;
+package com.flexible.store.repository.refreshtoken;
 
 import com.flexible.store.entity.UserAccountEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

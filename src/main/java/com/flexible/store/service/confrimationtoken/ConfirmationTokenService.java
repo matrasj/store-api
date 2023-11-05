@@ -1,6 +1,6 @@
-package com.flexible.store.service.useraccount;
+package com.flexible.store.service.confrimationtoken;
 
-import com.flexible.store.dto.useraccount.ConfirmationTokenDto;
+import com.flexible.store.dto.confirmationtoken.ConfirmationTokenDto;
 import com.flexible.store.entity.ConfirmationTokenEntity;
 import com.flexible.store.service.crud.CrudService;
 

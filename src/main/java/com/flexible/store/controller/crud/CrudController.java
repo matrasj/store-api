@@ -3,7 +3,7 @@ package com.flexible.store.controller.crud;
 import com.flexible.store.dto.abstraction.BaseDto;
 import com.flexible.store.entity.abstraction.BaseEntity;
 import com.flexible.store.exception.shared.EntityNotFoundException;
-import com.flexible.store.exception.shared.NoPermissionToResourceException;
+import com.flexible.store.exception.auth.NoPermissionToResourceException;
 import com.flexible.store.mapper.abstraction.EntityMapper;
 import com.flexible.store.service.auth.AuthoritiesResolver;
 import com.flexible.store.service.crud.CrudService;

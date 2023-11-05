@@ -1,6 +1,6 @@
 package com.flexible.store.kafka.impl;
 
-import com.flexible.store.config.KafkaPropertiesConfig;
+import com.flexible.store.config.kafka.KafkaPropertiesConfig;
 import com.flexible.store.kafka.KafkaProducer;
 import com.flexible.store.payload.useraccount.RegistrationEventPayload;
 import lombok.RequiredArgsConstructor;

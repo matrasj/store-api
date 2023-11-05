@@ -1,7 +1,7 @@
 package com.flexible.store.config;
 
 import com.flexible.store.exception.UserAccountNotFoundException;
-import com.flexible.store.repository.useraccount.UserAccountRepository;
+import com.flexible.store.repository.refreshtoken.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -4,8 +4,6 @@ import com.flexible.store.entity.abstraction.BaseEntity;
 import com.flexible.store.entity.type.Role;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,7 +11,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 
-@Entity(name = "user_account")
+@Entity
+@Table(name = "user_account")
 @NoArgsConstructor
 @AllArgsConstructor
 @Setter

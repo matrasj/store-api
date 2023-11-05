@@ -1,0 +1,52 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005-create-refresh-token-table
+      author: matrasj
+      preConditions:
+        onFail: MARK_RAN
+        not:
+          tableExists:
+            tableName: refresh_token
+      changes:
+        - createTable:
+            tableName: refresh_token
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: token
+                  type: VARCHAR
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_account_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+                    referencedColumnNames: id
+                    referencedTableName: user_account
+                    foreignKeyName: fk_refresh_token_user_account
+              - column:
+                  name: create_date
+                  type: timestamp without time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: last_edit_date
+                  type: timestamp without time zone
+              - column:
+                  name: removed
+                  type: boolean
+                  constraints:
+                    nullable: false
+                  defaultValue: false

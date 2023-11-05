@@ -2,7 +2,7 @@ package com.flexible.store.service.useraccount.impl;
 
 import com.flexible.store.dto.useraccount.UserAccountDto;
 import com.flexible.store.entity.UserAccountEntity;
-import com.flexible.store.repository.useraccount.UserAccountRepository;
+import com.flexible.store.repository.refreshtoken.UserAccountRepository;
 import com.flexible.store.service.crud.impl.CrudServiceImpl;
 import com.flexible.store.service.useraccount.UserAccountService;
 import lombok.RequiredArgsConstructor;

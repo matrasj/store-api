@@ -1,4 +1,4 @@
-package com.flexible.store.config;
+package com.flexible.store.config.kafka;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;

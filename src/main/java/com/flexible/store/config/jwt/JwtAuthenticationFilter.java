@@ -1,4 +1,4 @@
-package com.flexible.store.config;
+package com.flexible.store.config.jwt;
 
 import com.flexible.store.service.auth.JwtTokenService;
 import jakarta.servlet.FilterChain;

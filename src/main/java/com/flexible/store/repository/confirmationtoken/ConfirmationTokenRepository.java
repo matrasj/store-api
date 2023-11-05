@@ -1,4 +1,4 @@
-package com.flexible.store.repository.useraccount;
+package com.flexible.store.repository.confirmationtoken;
 
 import com.flexible.store.entity.ConfirmationTokenEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,4 +1,4 @@
-package com.flexible.store.exception.shared;
+package com.flexible.store.exception.auth;
 
 public class NoPermissionToResourceException extends RuntimeException {
 }

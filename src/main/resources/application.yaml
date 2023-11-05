@@ -27,7 +27,9 @@ kafka:
   topic:
     registrations:
       name: registration_events
-# Jwt
-jwt:
-  secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566b5970
-  expiration-time-hours: 24
+# Tokens
+token:
+  jwt-token-expiration-time-minutes: 2
+  refresh-token-expiration-time-days: 31
+  confirmation-token-expiration-time-minutes: 15
+  jwt-token-secret-key: 404E635266556A586E3272357538782F413F4428472B4B6250645367566b5970

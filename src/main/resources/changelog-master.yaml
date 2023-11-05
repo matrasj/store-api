@@ -7,3 +7,5 @@ databaseChangeLog:
       file: db/003-create-user-address-table.yaml
   - include:
       file: db/004-create-confirmation-token-table.yaml
+  - include:
+      file: db/005-create-refresh-token-table.yaml

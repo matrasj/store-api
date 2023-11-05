@@ -1,12 +1,13 @@
 package com.flexible.store.service.auth.impl;
 
+import com.flexible.store.config.token.TokenPropertiesConfig;
 import com.flexible.store.service.auth.JwtTokenService;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import org.springframework.beans.factory.annotation.Value;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +16,9 @@ import java.util.*;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtTokenServiceImpl implements JwtTokenService {
-    @Value("${jwt.expiration-time-hours}")
-    private Long hoursDuration;
-
-    @Value("${jwt.secret-key}")
-    private String secretKey;
+    private final TokenPropertiesConfig tokenPropertiesConfig;
 
     @Override
     public String extractUsernameFromJwtToken(String jwtToken) {
@@ -47,7 +45,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + this.hoursDuration * 1000 * 60 * 60))
+                .setExpiration(new Date(System.currentTimeMillis() + this.tokenPropertiesConfig.getJwtTokenExpirationTimeInMinutes() * 1000 * 60))
                 .signWith(this.getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -70,7 +68,7 @@ public class JwtTokenServiceImpl implements JwtTokenService {
     }
 
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+        byte[] keyBytes = Decoders.BASE64.decode(this.tokenPropertiesConfig.getSecretKey());
         return Keys.hmacShaKeyFor(keyBytes);
     }
 

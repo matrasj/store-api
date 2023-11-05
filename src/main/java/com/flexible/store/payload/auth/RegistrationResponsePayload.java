@@ -7,7 +7,6 @@ import lombok.*;
 @Getter
 @Setter
 @Builder
-public class AuthenticationResponsePayload {
-    private String jwtToken;
-    private String refreshToken;
+public class RegistrationResponsePayload {
+    private String confirmationToken;
 }

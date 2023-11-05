@@ -1,4 +1,4 @@
-package com.flexible.store.config;
+package com.flexible.store.config.kafka;
 
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
