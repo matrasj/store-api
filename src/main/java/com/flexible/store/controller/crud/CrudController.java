@@ -8,6 +8,7 @@ import com.flexible.store.mapper.abstraction.EntityMapper;
 import com.flexible.store.service.auth.AuthoritiesResolver;
 import com.flexible.store.service.crud.CrudService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
