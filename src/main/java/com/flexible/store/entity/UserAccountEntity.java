@@ -1,15 +1,20 @@
 package com.flexible.store.entity;
 
-import com.flexible.store.entity.abstraction.BaseEntity;
+import com.flexible.store.entity.type.Permission;
 import com.flexible.store.entity.type.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Entity
 @Table(name = "user_account")
@@ -17,7 +22,20 @@ import java.util.Collections;
 @AllArgsConstructor
 @Setter
 @Getter
-public class UserAccountEntity extends BaseEntity implements UserDetails {
+@Builder
+public class UserAccountEntity implements UserDetails {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "create_date")
+    @CreationTimestamp
+    private LocalDateTime createDate;
+    @Column(name = "last_edit_date")
+    @UpdateTimestamp
+    private LocalDateTime lastEditDate;
+    @Column(name = "removed")
+    private Boolean removed;
     @Column(name = "email")
     private String email;
     @Column(name = "help_email")
@@ -40,7 +58,12 @@ public class UserAccountEntity extends BaseEntity implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + this.role));
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        List<Permission> permissions = this.role.getPermissions();
+
+        authorities.add(new SimpleGrantedAuthority("ROLE_" + this.role));
+        permissions.forEach((permission -> authorities.add(new SimpleGrantedAuthority(permission.name()))));
+        return authorities;
     }
 
     @Override

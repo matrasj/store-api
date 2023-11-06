@@ -1,13 +1,9 @@
 package com.flexible.store.entity;
 
-import com.flexible.store.entity.abstraction.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -17,7 +13,20 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Setter
 @Getter
-public class RefreshTokenEntity extends BaseEntity {
+@Builder
+public class RefreshTokenEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "create_date")
+    @CreationTimestamp
+    private LocalDateTime createDate;
+    @Column(name = "last_edit_date")
+    @UpdateTimestamp
+    private LocalDateTime lastEditDate;
+    @Column(name = "removed")
+    private Boolean removed;
     @Column(name = "token")
     private String token;
     @Column(name = "expires_at")

@@ -2,12 +2,13 @@ package com.flexible.store.controller.auth;
 
 import com.flexible.store.entity.RefreshTokenEntity;
 import com.flexible.store.entity.UserAccountEntity;
-import com.flexible.store.exception.shared.EntityNotFoundException;
+import com.flexible.store.exception.common.EntityNotFoundException;
 import com.flexible.store.payload.auth.*;
+import com.flexible.store.repository.refreshtoken.RefreshTokenRepository;
+import com.flexible.store.repository.refreshtoken.UserAccountRepository;
 import com.flexible.store.service.auth.AuthenticationService;
 import com.flexible.store.service.auth.JwtTokenService;
 import com.flexible.store.service.refreshtoken.RefreshTokenService;
-import com.flexible.store.service.useraccount.UserAccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +21,8 @@ import org.springframework.web.bind.annotation.*;
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
     private final RefreshTokenService refreshTokenService;
-    private final UserAccountService userAccountService;
+    private final RefreshTokenRepository refreshTokenRepository;
+    private final UserAccountRepository userAccountRepository;
     private final JwtTokenService jwtTokenService;
 
     @PostMapping("/register")
@@ -38,9 +40,9 @@ public class AuthenticationController {
     @PostMapping("/refresh-token")
     public ResponseEntity<AuthenticationResponsePayload> refreshToken(@RequestBody RefreshTokenRequestPayload tokenRequestPayload) {
         RefreshTokenEntity refreshTokenEntity
-                = this.refreshTokenService.findByToken(tokenRequestPayload.getRefreshToken()).orElseThrow(EntityNotFoundException::new);
+                = this.refreshTokenRepository.findByToken(tokenRequestPayload.getRefreshToken()).orElseThrow(EntityNotFoundException::new);
         this.refreshTokenService.verifyExpiration(refreshTokenEntity);
-        UserAccountEntity userAccount = this.userAccountService.getById(refreshTokenEntity.getUserAccountId()).orElseThrow(EntityNotFoundException::new);
+        UserAccountEntity userAccount = this.userAccountRepository.findById(refreshTokenEntity.getUserAccountId()).orElseThrow(EntityNotFoundException::new);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(AuthenticationResponsePayload
                         .builder()

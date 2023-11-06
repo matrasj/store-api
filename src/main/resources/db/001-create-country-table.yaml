@@ -23,11 +23,13 @@ databaseChangeLog:
                   type: VARCHAR
                   constraints:
                     nullable: false
+                    unique: true
               - column:
                   name: code
                   type: VARCHAR
                   constraints:
                     nullable: false
+                    unique: true
               - column:
                   name: create_date
                   type: timestamp without time zone

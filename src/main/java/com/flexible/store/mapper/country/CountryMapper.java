@@ -1,10 +1,16 @@
 package com.flexible.store.mapper.country;
 
-import com.flexible.store.dto.country.CountryDto;
 import com.flexible.store.entity.CountryEntity;
-import com.flexible.store.mapper.abstraction.EntityMapper;
-import org.mapstruct.Mapper;
+import com.flexible.store.payload.country.CountryPayloadResponse;
 
-@Mapper(componentModel = "spring")
-public abstract class CountryMapper implements EntityMapper<CountryEntity, CountryDto> {
+public class CountryMapper {
+    public static CountryPayloadResponse fromEntityToPayloadResponse(CountryEntity country) {
+        return CountryPayloadResponse.builder()
+                .code(country.getCode())
+                .name(country.getName())
+                .lastEditDate(country.getLastEditDate())
+                .createDate(country.getCreateDate())
+                .removed(country.getRemoved())
+                .build();
+    }
 }

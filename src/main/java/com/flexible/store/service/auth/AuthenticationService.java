@@ -9,5 +9,4 @@ public interface AuthenticationService {
     RegistrationResponsePayload register(RegistrationRequestPayload requestPayload);
     AuthenticationResponsePayload authenticate(AuthenticationRequestPayload requestPayload);
     String confirmToken(Long confirmationTokenId);
-
 }

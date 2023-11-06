@@ -1,6 +1,5 @@
 package com.flexible.store.entity;
 
-import com.flexible.store.entity.abstraction.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -15,7 +14,19 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Builder
-public class UserAddressEntity extends BaseEntity {
+public class UserAddressEntity {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+    @Column(name = "create_date")
+    @CreationTimestamp
+    private LocalDateTime createDate;
+    @Column(name = "last_edit_date")
+    @UpdateTimestamp
+    private LocalDateTime lastEditDate;
+    @Column(name = "removed")
+    private Boolean removed;
     @Column(name = "email")
     private String email;
     @Column(name = "firstname")

@@ -3,24 +3,24 @@ package com.flexible.store.service.auth.impl;
 import com.flexible.store.entity.ConfirmationTokenEntity;
 import com.flexible.store.entity.RefreshTokenEntity;
 import com.flexible.store.entity.UserAccountEntity;
-import com.flexible.store.entity.type.Role;
 import com.flexible.store.exception.auth.InvalidCredentialsException;
+import com.flexible.store.exception.common.EntityNotFoundException;
 import com.flexible.store.factories.TokenFactory;
 import com.flexible.store.kafka.KafkaProducer;
 import com.flexible.store.mapper.useraccount.UserAccountMapper;
 import com.flexible.store.payload.auth.AuthenticationResponsePayload;
 import com.flexible.store.payload.useraccount.RegistrationEventPayload;
+import com.flexible.store.repository.confirmationtoken.ConfirmationTokenRepository;
+import com.flexible.store.repository.refreshtoken.RefreshTokenRepository;
+import com.flexible.store.repository.refreshtoken.UserAccountRepository;
 import com.flexible.store.service.auth.JwtTokenService;
 import com.flexible.store.payload.auth.AuthenticationRequestPayload;
 import com.flexible.store.payload.auth.RegistrationResponsePayload;
 import com.flexible.store.payload.auth.RegistrationRequestPayload;
 import com.flexible.store.service.auth.AuthenticationService;
-import com.flexible.store.service.confrimationtoken.ConfirmationTokenService;
-import com.flexible.store.service.refreshtoken.RefreshTokenService;
-import com.flexible.store.service.useraccount.UserAccountService;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -32,26 +32,23 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationServiceImpl implements AuthenticationService {
-    private final UserAccountService userAccountService;
+    private final UserAccountRepository userAccountRepository;
     private final PasswordEncoder passwordEncoder;
-    private final UserAccountMapper userAccountMapper;
     private final JwtTokenService jwtTokenService;
-    private final RefreshTokenService refreshTokenService;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final KafkaProducer kafkaProducer;
-    private final ConfirmationTokenService confirmationTokenService;
+    private final ConfirmationTokenRepository confirmationTokenRepository;
     private final AuthenticationManager authenticationManager;
     private final TokenFactory tokenFactory;
 
     @Override
     @Transactional
     public RegistrationResponsePayload register(RegistrationRequestPayload requestPayload) {
-        var account = new UserAccountEntity();
-        this.setAccountProperties(requestPayload, account);
+        UserAccountEntity userAccount = UserAccountMapper.fromRequestPayloadToEntity(requestPayload);
+        userAccount.setPassword(this.passwordEncoder.encode(requestPayload.getPassword()));
+        UserAccountEntity savedUserAccount = this.userAccountRepository.save(userAccount);
 
-        UserAccountEntity savedUserAccount = this.userAccountService.save(this.userAccountMapper.toDto(account));
-        ConfirmationTokenEntity savedConfirmationToken
-                = this.confirmationTokenService.save(this.tokenFactory.generateConfirmationToken(savedUserAccount.getId()));
-
+        ConfirmationTokenEntity savedConfirmationToken = this.confirmationTokenRepository.save(this.tokenFactory.generateConfirmationToken(savedUserAccount.getId()));
         this.kafkaProducer.publishMessageAboutRegistration(this.buildRegistrationPayload(savedUserAccount, savedConfirmationToken));
         return RegistrationResponsePayload.builder()
                 .confirmationToken(savedConfirmationToken.getToken())
@@ -60,18 +57,23 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public AuthenticationResponsePayload authenticate(AuthenticationRequestPayload requestPayload) {
-        Authentication authentication = this.authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(
-                        requestPayload.getUsername(),
-                        requestPayload.getPassword()
-                )
-        );
-        UserAccountEntity userAccount = this.userAccountService.findByEmail(requestPayload.getUsername())
-                .orElseThrow(EntityNotFoundException::new);
+        UserAccountEntity userAccount = this.userAccountRepository.findByEmail(requestPayload.getUsername())
+                .orElseThrow(() -> new EntityNotFoundException("No account exists with email: " + requestPayload.getUsername()));
+        Authentication authentication = null;
+        try {
+             authentication = this.authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            requestPayload.getUsername(),
+                            requestPayload.getPassword()
+                    )
+            );
+        } catch (BadCredentialsException badCredentialsException) {
+            throw new InvalidCredentialsException("Invalid password for email: " + requestPayload.getUsername());
+        }
 
         if (authentication.isAuthenticated()) {
             RefreshTokenEntity savedRefreshToken
-                    = this.refreshTokenService.save(this.tokenFactory.generateRefreshToken(userAccount.getId()));
+                    = this.refreshTokenRepository.save(this.tokenFactory.generateRefreshToken(userAccount.getId()));
             return AuthenticationResponsePayload.builder()
                     .jwtToken(this.jwtTokenService.generateJwtToken(userAccount))
                     .refreshToken(savedRefreshToken.getToken())
@@ -79,14 +81,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         } else {
             throw new InvalidCredentialsException();
         }
-
     }
 
     @Override
     @Transactional
     public String confirmToken(Long confirmationTokenId) {
         ConfirmationTokenEntity confirmationToken
-                = this.confirmationTokenService.getById(confirmationTokenId).orElseThrow(EntityNotFoundException::new);
+                = this.confirmationTokenRepository.findById(confirmationTokenId).orElseThrow(EntityNotFoundException::new);
 
         if (confirmationToken.getConfirmedAt() != null) {
             throw new IllegalStateException("Account is already confirmed");
@@ -98,7 +99,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         }
 
         confirmationToken.setConfirmedAt(LocalDateTime.now());
-        UserAccountEntity userAccount = this.userAccountService.getById(confirmationToken.getUserAccountId())
+        UserAccountEntity userAccount = this.userAccountRepository.findById(confirmationToken.getUserAccountId())
                 .orElseThrow(EntityNotFoundException::new);
         userAccount.setActive(Boolean.TRUE);
         return "Successfully confirmed";
@@ -111,16 +112,5 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 .lastname(savedUserAccount.getLastname())
                 .confirmationTokenId(savedConfirmationToken.getId())
                 .build();
-    }
-
-    private void setAccountProperties(RegistrationRequestPayload requestPayload, UserAccountEntity account) {
-        account.setFirstname(requestPayload.getFirstname());
-        account.setLastname(requestPayload.getLastname());
-        account.setEmail(requestPayload.getEmail());
-        account.setUsername(requestPayload.getEmail());
-        account.setPhoneNumber(requestPayload.getPhoneNumber());
-        account.setRole(Role.CUSTOMER);
-        account.setActive(Boolean.FALSE);
-        account.setPassword(this.passwordEncoder.encode(requestPayload.getPassword()));
     }
 }

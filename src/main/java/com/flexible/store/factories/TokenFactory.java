@@ -1,8 +1,8 @@
 package com.flexible.store.factories;
 
 import com.flexible.store.config.token.TokenPropertiesConfig;
-import com.flexible.store.dto.confirmationtoken.ConfirmationTokenDto;
-import com.flexible.store.dto.refreshtoken.RefreshTokenDto;
+import com.flexible.store.entity.ConfirmationTokenEntity;
+import com.flexible.store.entity.RefreshTokenEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -14,20 +14,22 @@ import java.util.UUID;
 public class TokenFactory {
     private final TokenPropertiesConfig tokenPropertiesConfig;
 
-    public ConfirmationTokenDto generateConfirmationToken(Long userAccountId) {
-        ConfirmationTokenDto confirmationTokenDto = new ConfirmationTokenDto();
-        confirmationTokenDto.setToken(UUID.randomUUID().toString());
-        confirmationTokenDto.setExpiresAt(LocalDateTime.now().plusMinutes(this.tokenPropertiesConfig.getConfirmationTokenExpirationTimeInMinutes()));
-        confirmationTokenDto.setUserAccountId(userAccountId);
-        return confirmationTokenDto;
+    public ConfirmationTokenEntity generateConfirmationToken(Long userAccountId) {
+        return ConfirmationTokenEntity.builder()
+                .removed(Boolean.FALSE)
+                .token(UUID.randomUUID().toString())
+                .expiresAt(LocalDateTime.now().plusMinutes(this.tokenPropertiesConfig.getConfirmationTokenExpirationTimeInMinutes()))
+                .userAccountId(userAccountId)
+                .build();
     }
 
-    public RefreshTokenDto generateRefreshToken(Long userAccountId) {
-        RefreshTokenDto refreshToken = new RefreshTokenDto();
-        refreshToken.setUserAccountId(userAccountId);
-        refreshToken.setToken(UUID.randomUUID().toString());
-        refreshToken.setExpiresAt(LocalDateTime.now().plusDays(this.tokenPropertiesConfig.getRefreshTokenExpirationTimeInDays()));
-        return refreshToken;
+    public RefreshTokenEntity generateRefreshToken(Long userAccountId) {
+        return RefreshTokenEntity.builder()
+                .removed(Boolean.FALSE)
+                .token(UUID.randomUUID().toString())
+                .expiresAt(LocalDateTime.now().plusDays(this.tokenPropertiesConfig.getRefreshTokenExpirationTimeInDays()))
+                .userAccountId(userAccountId)
+                .build();
     }
 
 }

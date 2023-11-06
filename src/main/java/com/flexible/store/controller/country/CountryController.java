@@ -1,36 +1,40 @@
 package com.flexible.store.controller.country;
 
-import com.flexible.store.controller.crud.CrudController;
-import com.flexible.store.dto.country.CountryDto;
-import com.flexible.store.entity.CountryEntity;
+import com.flexible.store.payload.country.CountryPayloadRequest;
+import com.flexible.store.payload.country.CountryPayloadResponse;
+import com.flexible.store.service.country.CountryService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-
-import static com.flexible.store.entity.type.Role.*;
 
 @RestController
 @RequestMapping("/api/country")
 @RequiredArgsConstructor
-public class CountryController extends CrudController<CountryEntity, CountryDto> {
-    @Override
-    public boolean hasPermissionToSave() {
-        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(ADMIN, MODERATOR, EMPLOYEE));
+public class CountryController {
+    private final CountryService countryService;
+
+    @PostMapping
+    @PreAuthorize("hasAuthority('COUNTRY_CREATE')")
+    public ResponseEntity<CountryPayloadResponse> createCountry(@RequestBody @Valid CountryPayloadRequest countryPayloadRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(this.countryService.create(countryPayloadRequest));
     }
 
-    @Override
-    public boolean hasPermissionToRead() {
-        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(ADMIN, MODERATOR, EMPLOYEE, CUSTOMER));
+    @GetMapping
+    @PreAuthorize("hasAuthority('COUNTRY_READ')")
+    public ResponseEntity<List<CountryPayloadResponse>> getAllCountries() {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.countryService.getAll());
     }
 
-    @Override
-    public boolean hasPermissionToUpdate() {
-        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(ADMIN, MODERATOR, EMPLOYEE));
-    }
-
-    @Override
-    public boolean hasPermissionToDelete() {
-        return super.authoritiesResolver.hasOneOfRolesAndIsActive(List.of(ADMIN, MODERATOR, EMPLOYEE));
+    @GetMapping("/{countryId}")
+    @PreAuthorize("hasAuthority('COUNTRY_READ')")
+    public ResponseEntity<CountryPayloadResponse> getById(@PathVariable Long countryId) {
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(this.countryService.getById(countryId));
     }
 }

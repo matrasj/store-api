@@ -1,6 +1,6 @@
 package com.flexible.store.config;
 
-import com.flexible.store.exception.UserAccountNotFoundException;
+import com.flexible.store.exception.common.EntityNotFoundException;
 import com.flexible.store.repository.refreshtoken.UserAccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ public class ApplicationConfig {
     @Bean
     public UserDetailsService userDetailsService() {
         return username -> this.userAccountRepository.findByEmail(username)
-                .orElseThrow(() -> new UserAccountNotFoundException(String.format("Not found user with email: %s", username)));
+                .orElseThrow(() -> new EntityNotFoundException(String.format("Not found user with email: %s", username)));
     }
 
     @Bean

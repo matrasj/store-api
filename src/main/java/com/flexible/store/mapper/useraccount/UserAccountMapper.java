@@ -1,10 +1,21 @@
 package com.flexible.store.mapper.useraccount;
 
-import com.flexible.store.dto.useraccount.UserAccountDto;
 import com.flexible.store.entity.UserAccountEntity;
-import com.flexible.store.mapper.abstraction.EntityMapper;
-import org.mapstruct.Mapper;
+import com.flexible.store.entity.type.Role;
+import com.flexible.store.payload.auth.RegistrationRequestPayload;
 
-@Mapper(componentModel = "spring")
-public abstract class UserAccountMapper implements EntityMapper<UserAccountEntity, UserAccountDto> {
+public class UserAccountMapper {
+
+    public static UserAccountEntity fromRequestPayloadToEntity(RegistrationRequestPayload requestPayload) {
+        return UserAccountEntity.builder()
+                .firstname(requestPayload.getFirstname())
+                .lastname(requestPayload.getLastname())
+                .email(requestPayload.getEmail())
+                .username(requestPayload.getUsername())
+                .phoneNumber(requestPayload.getPhoneNumber())
+                .role(Role.CUSTOMER)
+                .active(Boolean.FALSE)
+                .removed(Boolean.FALSE)
+                .build();
+    }
 }

@@ -1,34 +1,56 @@
 package com.flexible.store.service.country.impl;
 
-import com.flexible.store.dto.country.CountryDto;
 import com.flexible.store.entity.CountryEntity;
+import com.flexible.store.exception.WebApiException;
+import com.flexible.store.exception.common.EntityNotFoundException;
+import com.flexible.store.mapper.country.CountryMapper;
+import com.flexible.store.payload.country.CountryPayloadRequest;
+import com.flexible.store.payload.country.CountryPayloadResponse;
+import com.flexible.store.repository.country.CountryRepository;
 import com.flexible.store.service.country.CountryService;
-import com.flexible.store.service.crud.impl.CrudServiceImpl;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
-public class CountryServiceImpl extends CrudServiceImpl<CountryEntity, CountryDto> implements CountryService {
+public class CountryServiceImpl implements CountryService {
+    private final CountryRepository countryRepository;
     @Override
-    @Cacheable(cacheNames = "countries")
-    public List<CountryEntity> getAll() {
-        return super.getAll();
+    public CountryPayloadResponse create(CountryPayloadRequest countryPayloadRequest) {
+        this.validateRequest(countryPayloadRequest);
+        return CountryMapper.fromEntityToPayloadResponse(this.countryRepository.save(CountryEntity.builder()
+                .name(countryPayloadRequest.getName())
+                .code(countryPayloadRequest.getCode())
+                .removed(Boolean.FALSE)
+                .build()));
     }
 
     @Override
-    @CacheEvict(cacheNames = "countries", allEntries = true)
-    public List<CountryEntity> saveAll(List<CountryDto> countryDtos) {
-        return super.saveAll(countryDtos);
+    public List<CountryPayloadResponse> getAll() {
+        return this.countryRepository.findAll()
+                .stream()
+                .map(CountryMapper::fromEntityToPayloadResponse)
+                .collect(Collectors.toList());
+    }
+
+    private void validateRequest(CountryPayloadRequest countryPayloadRequest) {
+        if (this.countryRepository.findNotRemovedByName(countryPayloadRequest.getName()).isPresent()) {
+            throw new WebApiException("Country with name: " + countryPayloadRequest.getName() + " already exists");
+        }
+
+        if (this.countryRepository.findNotRemovedByCode(countryPayloadRequest.getCode()).isPresent()) {
+            throw new WebApiException("Country with code: " + countryPayloadRequest.getCode() + " already exists");
+        }
     }
 
     @Override
-    @CacheEvict(cacheNames = "countries", allEntries = true)
-    public CountryEntity save(CountryDto dto) {
-        return super.save(dto);
+    public CountryPayloadResponse getById(Long countryId) {
+        return CountryMapper.fromEntityToPayloadResponse(
+                this.countryRepository.findById(countryId).orElseThrow(EntityNotFoundException::new)
+        );
     }
 }
